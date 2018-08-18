@@ -1,0 +1,146 @@
+<rsb:script>
+   <rsb:info title="bill" desc="">
+    <attr name="error_code"                  xs:type="string"       other:xPath="error_code" />
+    <attr name="error_message"               xs:type="string"       other:xPath="error_message" />
+    <attr name="number"                      xs:type="string"       other:xPath="number" />
+    <attr name="bs_residence_code"           xs:type="string"       other:xPath="bs_residence_code" />
+    <attr name="billing_code"                xs:type="string"       other:xPath="billing_code" />
+    <attr name="billing_name"                xs:type="string"       other:xPath="billing_name" />
+    <attr name="billing_individual_number"   xs:type="string"       other:xPath="billing_individual_number" />
+    <attr name="billing_individual_code"     xs:type="string"       other:xPath="billing_individual_code" />
+    <attr name="billing_individual_name"     xs:type="string"       other:xPath="billing_individual_name" />
+    <attr name="demand_number"               xs:type="string"       other:xPath="demand_number" />
+    <attr name="subtotal_amount_billed"      xs:type="integer"      other:xPath="subtotal_amount_billed" />
+    <attr name="consumption_tax_amount"      xs:type="integer"      other:xPath="consumption_tax_amount" />
+    <attr name="total_amount_billed"         xs:type="integer"      other:xPath="total_amount_billed" />
+    <attr name="unclearing_amount"           xs:type="integer"      other:xPath="unclearing_amount" />
+    <attr name="message_column"              xs:type="string"       other:xPath="message_column" />
+    <attr name="billing_method"              xs:type="integer"      other:xPath="billing_method" />
+    <attr name="issue_date"                  xs:type="datetime"     other:xPath="issue_date" />
+    <attr name="make_date"                   xs:type="datetime"     other:xPath="make_date" />
+    <attr name="sending_scheduled_date"      xs:type="datetime"     other:xPath="sending_scheduled_date" />
+    <attr name="sending_date"                xs:type="datetime"     other:xPath="sending_date" />
+    <attr name="update_date"                 xs:type="datetime"     other:xPath="update_date" />
+    <attr name="confirm_date"                xs:type="datetime"     other:xPath="confirm_date" />
+    <attr name="mail_send_flg"               xs:type="integer"      other:xPath="mail_send_flg" />
+    <attr name="post_send_flg"               xs:type="integer"      other:xPath="post_send_flg" />
+    <attr name="payment_method"              xs:type="integer"      other:xPath="payment_method" />
+    <attr name="payment_method_number"       xs:type="string"       other:xPath="payment_method_number" />
+    <attr name="payment_method_code"         xs:type="string"       other:xPath="payment_method_code" />
+    <attr name="payment_method_name"         xs:type="string"       other:xPath="payment_method_name" />
+    <attr name="settlement_result"           xs:type="integer"      other:xPath="settlement_result" />
+    <attr name="transfer_deadline"           xs:type="datetime"     other:xPath="transfer_deadline" />
+    <attr name="slip_deadline"               xs:type="datetime"     other:xPath="slip_deadline" />
+    <attr name="transfer_date"               xs:type="datetime"     other:xPath="transfer_date" />
+    <attr name="payment_status"              xs:type="integer"      other:xPath="payment_status" />
+    <attr name="memo"                        xs:type="string"       other:xPath="memo" />
+    <attr name="template_code"               xs:type="string"       other:xPath="template_code" />
+    <attr name="bs_department_code"          xs:type="string"       other:xPath="bs_department_code" />
+    <attr name="bs_department_name"          xs:type="string"       other:xPath="bs_department_name" />
+    <attr name="bs_owner_code"               xs:type="string"       other:xPath="bs_owner_code" />
+    <attr name="bs_owner_name"               xs:type="string"       other:xPath="bs_owner_name" />
+    <attr name="valid_flg"                   xs:type="integer"      other:xPath="valid_flg" />
+    <attr name="delete_flg"                  xs:type="integer"      other:xPath="delete_flg" />
+    <attr name="gid"                         xs:type="integer"      other:xPath="gid" />
+    <attr name="carryover_status"            xs:type="integer"      other:xPath="carryover_status" />
+    <attr name="carryover_transit_bill_number"    xs:type="string"  other:xPath="carryover_transit_bill_number" />
+    <attr name="carryover_total_amount"      xs:type="integer"      other:xPath="carryover_total_amount" />
+    <attr name="download_url"                xs:type="string"       other:xPath="download_url" />
+    <input name="issue_start_date"           xs:type="string"   />
+    <input name="issue_stop_date"            xs:type="string"   />    
+  </rsb:info>
+
+  <!-- Column XPaths are relative to a RepeatElement that splits the JSON into rows. -->
+  <rsb:set attr="uri"  value="https://billing-robo.jp/api/v1.0/bill/search_list" />
+  <rsb:set attr="RepeatElement"  value="/bill" />
+  <rsb:set attr="ContentType"  value="application/json" />
+  <rsb:set attr="Method" value="POST"/>
+
+  <!-- Check about user_id. -->
+  <rsb:null attr="_connection.user_id">
+    <rsb:throw code="500" desc="Need to set user_id in connection string."/>
+  </rsb:null>
+
+  <!-- Check about access_key. -->
+  <rsb:null attr="_connection.access_key">
+    <rsb:throw code="500" desc="Need to set access_key in connection string."/>
+  </rsb:null>
+
+  <!-- Check about issue_start_date. -->
+  <rsb:check attr="_input.issue_start_date">
+    <rsb:set attr="_input.issue_start_date" value="[_input.issue_start_date]"/>
+    <rsb:else>
+      <rsb:set attr="_input.issue_start_date" value="1970/01/01"/>
+    </rsb:else>
+  </rsb:check>
+
+  <!-- Check about issue_stop_date. -->
+  <rsb:check attr="_input.issue_stop_date">
+    <rsb:set attr="_input.issue_stop_date" value="[_input.issue_stop_date]"/>
+    <rsb:else>
+      <rsb:set attr="_input.issue_stop_date" value="2999/12/31"/>
+    </rsb:else>
+  </rsb:check>
+
+  <rsb:set attr="Data">
+    {
+    "user_id": "[_connection.user_id]",
+    "access_key": "[_connection.access_key]",
+    "payment_status": "",
+    "limit_count": "",
+    "page_count": "",
+    "bill": 
+      \[
+        {
+        "number": "",
+        "billing_code": "",
+        "billing_individual_number": "",
+        "billing_individual_code": "",
+        "issue_start_date": "[_input.issue_start_date]",
+        "issue_stop_date": "[_input.issue_stop_date]",
+        "update_start_date": "",
+        "update_stop_date": "",
+        "deadline_start_date": "",
+        "deadline_stop_date": "",
+        "payment_method": "",
+        "goods_code": "",
+        "bs_owner_code": "" 
+        }
+      \]
+    }
+  </rsb:set>
+
+  <!-- The GET method corresponds to SELECT. Within the script block, you can see the URI modified to append a query string parameter. The results of processing are pushed to the schema's output. See SELECT Execution for more information. -->
+  <rsb:script method="GET">
+    <rsb:call op="jsonproviderGet">
+      <rsb:push/>
+    </rsb:call>
+  </rsb:script>
+
+  <!-- To add support for INSERTS please see the INSERT Execution page within the help for further information and examples. -->
+  <rsb:script method="POST">
+    <rsb:set attr="method" value="POST"/>
+    <rsb:call op="jsonproviderGet">
+      <rsb:throw code="500" desc="Inserts are not currently supported."/>
+      <rsb:push/>
+    </rsb:call>
+  </rsb:script>
+
+  <!-- To add support for UPDATES please see the UPDATE Execution page within the help for further information and examples. -->
+  <rsb:script method="MERGE">
+    <rsb:set attr="method" value="PUT"/>
+    <rsb:call op="jsonproviderGet">
+      <rsb:throw code="500" desc="Updates are not currently supported."/>
+      <rsb:push/>
+    </rsb:call>
+  </rsb:script>
+
+  <!-- To add support for DELETES please see the DELETE Execution page within the help for further information and examples. -->
+  <rsb:script method="DELETE">
+    <rsb:set attr="method" value="DELETE"/>
+    <rsb:call op="jsonproviderGet">
+      <rsb:throw code="500" desc="Deletes are not currently supported."/>
+      <rsb:push/>
+    </rsb:call>
+  </rsb:script>
+</rsb:script>
